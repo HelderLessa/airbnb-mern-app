@@ -10,12 +10,32 @@ const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const fs = require("fs");
+const { initializeApp } = require("firebase/app");
+const {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} = require("firebase/storage");
 
 require("dotenv").config();
 const app = express();
 
 const saltRounds = 10;
-const jwtSecret = "aksjdhl2qkjdhlkj32h4l32k4dskahj";
+const jwtSecret = process.env.JWT_SECRET;
+
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const storage = getStorage(firebaseApp);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -61,10 +81,9 @@ app.post("/register", async (req, res) => {
     res.status(201).json({
       name: userDoc.name,
       email: userDoc.email,
-      password: userDoc.password,
     });
   } catch (err) {
-    console.error("Failed registering user", err);
+    console.error("Failed registering user!", err);
 
     if (err.code === 11000) {
       return res.status(422).json({ message: "This email is already in use!" });
@@ -77,6 +96,7 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const userDoc = await User.findOne({ email });
+
   if (userDoc) {
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
@@ -93,10 +113,10 @@ app.post("/login", async (req, res) => {
         }
       );
     } else {
-      res.status(422).json(userDoc);
+      return res.status(401).json({ message: "Invalid credentials!" });
     }
   } else {
-    res.json("not found");
+    res.status(404).json({ message: "User not found!" });
   }
 });
 
@@ -104,9 +124,13 @@ app.get("/profile", (req, res) => {
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const { name, email, _id } = await User.findById(userData.id);
-      res.json({ name, email, _id });
+      if (err) return res.status(401).json({ message: "Invalid token!" });
+      const user = await User.findById(userData.id);
+      if (user) {
+        res.json({ name: user.name, email: user.email, _id: user._id });
+      } else {
+        res.status(404).json({ message: "User not found!" });
+      }
     });
   } else {
     res.json(null);
@@ -120,24 +144,47 @@ app.post("/logout", (req, res) => {
 app.post("/upload-by-link", async (req, res) => {
   const { link } = req.body;
   const newName = "photo" + Date.now() + ".jpg";
-  await imageDownloader.image({
-    url: link,
-    dest: __dirname + "/uploads/" + newName,
-  });
-  res.json(newName);
+  try {
+    await imageDownloader.image({
+      url: link,
+      dest: __dirname + "/uploads/" + newName,
+    });
+    res.json(newName);
+  } catch (error) {
+    res.status(500).json({ message: "Error downloading image!" });
+  }
 });
 
 const photosMiddleware = multer({ dest: "uploads/" });
-app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
+app.post("/upload", photosMiddleware.array("photos", 100), async (req, res) => {
   const uploadedFiles = [];
+
   for (let i = 0; i < req.files.length; i++) {
-    const { path, originalname } = req.files[i];
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    const newPath = path + "." + ext;
-    fs.renameSync(path, newPath);
-    uploadedFiles.push(newPath.replace(/uploads[\\\/]/, ""));
+    const file = req.files[i];
+
+    // Cria uma referência no Firebase Storage para cada arquivo
+    const storageRef = ref(storage, `images/${file.originalname}`);
+
+    try {
+      // Faz o upload do arquivo para o Firebase Storage
+      const snapshot = await uploadBytes(
+        storageRef,
+        fs.readFileSync(file.path)
+      );
+
+      // Obtém a URL de download para armazenar no banco de dados ou retornar ao cliente
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      uploadedFiles.push(downloadURL);
+
+      // Remove o arquivo temporário do sistema de arquivos local
+      fs.unlinkSync(file.path);
+    } catch (error) {
+      console.error("Error uploading file to Firebase Storage!", error);
+      return res.status(500).json({ error: "Error uploading to Firebase!" });
+    }
   }
+
+  // Retorna as URLs das imagens carregadas
   res.json(uploadedFiles);
 });
 
@@ -155,8 +202,9 @@ app.post("/places", (req, res) => {
     checkOut,
     maxGuests,
   } = req.body;
+
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
+    if (err) return res.status(401).json({ message: "Invalid token!" });
     const placeDoc = await Place.create({
       owner: userData.id,
       price,
@@ -177,6 +225,7 @@ app.post("/places", (req, res) => {
 app.get("/user-places", (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) return res.status(401).json({ message: "Invalid token!" });
     const { id } = userData;
     res.json(await Place.find({ owner: id }));
   });
@@ -184,7 +233,12 @@ app.get("/user-places", (req, res) => {
 
 app.get("/places/:id", async (req, res) => {
   const { id } = req.params;
-  res.json(await Place.findById(id));
+  const place = await Place.findById(id);
+  if (place) {
+    res.json(place);
+  } else {
+    res.status(404).json({ message: "Place not found!" });
+  }
 });
 
 app.put("/places", async (req, res) => {
@@ -202,9 +256,14 @@ app.put("/places", async (req, res) => {
     maxGuests,
     price,
   } = req.body;
+
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
+    if (err) return res.status(401).json({ message: "Invalid token!" });
+
     const placeDoc = await Place.findById(id);
+    if (!placeDoc) {
+      return res.status(404).json({ message: "Place not found!" });
+    }
     if (userData.id === placeDoc.owner.toString()) {
       placeDoc.set({
         title,
@@ -220,6 +279,10 @@ app.put("/places", async (req, res) => {
       });
       await placeDoc.save();
       res.json("ok");
+    } else {
+      res
+        .status(403)
+        .json({ message: "You don't have permission to update this place!" });
     }
   });
 });
@@ -229,25 +292,26 @@ app.get("/places", async (req, res) => {
 });
 
 app.post("/bookings", async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
-    req.body;
-  Booking.create({
-    place,
-    checkIn,
-    checkOut,
-    numberOfGuests,
-    name,
-    phone,
-    price,
-    user: userData.id,
-  })
-    .then((doc) => {
-      res.json(doc);
-    })
-    .catch((err) => {
-      throw err;
+  try {
+    const userData = await getUserDataFromReq(req);
+    const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+      req.body;
+
+    const bookingDoc = await Booking.create({
+      place,
+      checkIn,
+      checkOut,
+      numberOfGuests,
+      name,
+      phone,
+      price,
+      user: userData.id,
     });
+    res.json(bookingDoc);
+  } catch (err) {
+    console.error("Error creating booking!", err);
+    res.status(500).json({ message: "Error creating booking!" });
+  }
 });
 
 app.get("/bookings", async (req, res) => {
