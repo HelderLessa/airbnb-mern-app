@@ -1,6 +1,9 @@
 Airbnb Clone (MERN Stack)
 This project is a full-stack Airbnb clone built with the MERN stack (MongoDB, Express, React, Node.js). It replicates some of the core features of Airbnb, allowing users to browse, book, and list properties for rent.
 
+Demo:
+https://airbnb-mern-app.vercel.app/
+
 Features:
 User registration and login (authentication using JWT).
 Secure password storage with bcrypt.
