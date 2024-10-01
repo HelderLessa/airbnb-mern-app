@@ -41,14 +41,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? "https://airbnb-mern-app.vercel.app"
-    : "http://localhost:5173";
 app.use(
   cors({
+    origin: "https://airbnb-mern-ip079efmm-helderlessa5-projects.vercel.app",
     credentials: true,
-    origin: allowedOrigins,
   })
 );
 
