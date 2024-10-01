@@ -40,10 +40,15 @@ const storage = getStorage(firebaseApp);
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
+
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? "https://airbnb-mern-app.vercel.app"
+    : "http://localhost:5173";
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
   })
 );
 
