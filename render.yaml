@@ -2,13 +2,13 @@ services:
   - type: web
     name: airbnb-api
     env: node
-    rootDir: api
-    startCommand: node index.js
-    buildCommand: npm install
+    plan: free
+    buildCommand: cd api && npm install
+    startCommand: cd api && npm start
     envVars:
-      - key: PORT
-        value: 10000
       - key: MONGO_URL
+        sync: false
+      - key: JWT_SECRET
         sync: false
       - key: FIREBASE_API_KEY
         sync: false
@@ -24,12 +24,10 @@ services:
         sync: false
       - key: FIREBASE_MEASUREMENT_ID
         sync: false
-      - key: JWT_SECRET
-        sync: false
 
   - type: web
     name: airbnb-client
     env: static
-    rootDir: client
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
