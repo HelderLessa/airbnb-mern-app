@@ -2,7 +2,7 @@ services:
   - type: web
     name: airbnb-api
     env: node
-    plan: free
+    plan: starter
     buildCommand: cd api && npm install
     startCommand: cd api && npm start
     envVars:
@@ -28,6 +28,6 @@ services:
   - type: web
     name: airbnb-client
     env: static
-    plan: free
+    plan: starter
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: client/dist
