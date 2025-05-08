@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PhotosUploader from "../PhotosUploader";
 import Perks from "../Perks";
-import axios from "axios";
+import api from "../axios";
 import AccountNav from "../AccountNav";
 import { Navigate, useParams } from "react-router-dom";
 
@@ -23,7 +23,7 @@ export default function PlacesFormPages() {
     if (!id) {
       return;
     }
-    axios.get("/places/" + id).then((response) => {
+    api.get("/places/" + id).then((response) => {
       const { data } = response;
       setTitle(data.title);
       setAddress(data.address);
@@ -77,7 +77,7 @@ export default function PlacesFormPages() {
       });
       setRedirect(true);
     } else {
-      await axios.post("/places", placeData);
+      await api.post("/places", placeData);
       setRedirect(true);
     }
   }

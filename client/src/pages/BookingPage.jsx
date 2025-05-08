@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AddressLink from "../AddressLink";
@@ -13,7 +13,7 @@ export default function BookingPage() {
     const fetchBooking = async () => {
       if (id) {
         try {
-          const response = await axios.get("/bookings");
+          const response = await api.get("/bookings");
           const foundBooking = response.data.find(({ _id }) => _id === id);
           if (foundBooking) {
             setBooking(foundBooking);

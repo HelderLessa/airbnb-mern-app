@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "./axios";
 import { useState } from "react";
 
 export default function PhotosUploader({ addedPhotos, onChange }) {
@@ -6,7 +6,7 @@ export default function PhotosUploader({ addedPhotos, onChange }) {
 
   async function addPhotoByLink(e) {
     e.preventDefault();
-    const { data: filename } = await axios.post("/upload-by-link", {
+    const { data: filename } = await api.post("/upload-by-link", {
       link: photoLink,
     });
     onChange((prev) => {

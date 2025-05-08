@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../axios";
 import AccountNav from "../AccountNav";
 import { useEffect, useState } from "react";
 import PlaceImg from "../PlaceImg";
@@ -9,7 +9,7 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
-    axios.get("/bookings").then((response) => {
+    api.get("/bookings").then((response) => {
       setBookings(response.data);
     });
   }, []);

@@ -41,10 +41,18 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
+const allowedOrigins = ["http://localhost:5173"];
+
 app.use(
   cors({
-    origin: "https://airbnb-mern-ip079efmm-helderlessa5-projects.vercel.app",
     credentials: true,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 
@@ -324,6 +332,7 @@ app.get("/api/bookings", async (req, res) => {
   res.json(await Booking.find({ user: userData.id }).populate("place"));
 });
 
-app.listen(4000, () => {
-  console.log("Server running on port 4000");
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });

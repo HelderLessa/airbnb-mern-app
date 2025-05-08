@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import BookingWidget from "../BookingWidget";
@@ -12,7 +12,7 @@ export default function PlacePage() {
     if (!id) {
       return;
     }
-    axios.get("/places/" + id).then((response) => {
+    api.get("/places/" + id).then((response) => {
       setPlace(response.data);
     });
   }, [id]);

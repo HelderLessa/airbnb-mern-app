@@ -4,7 +4,6 @@ import IndexPage from "./pages/IndexPage";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./Layout";
 import RegisterPage from "./pages/RegisterPage";
-import axios from "axios";
 import { UserContextProvider } from "./UserContext";
 import ProfilePage from "./pages/ProfilePage";
 import PlacesPage from "./pages/PlacesPage";
@@ -12,9 +11,6 @@ import PlacesFormPages from "./pages/PlacesFormPages";
 import PlacePage from "./pages/PlacePage";
 import BookingsPage from "./pages/BookingsPage";
 import BookingPage from "./pages/BookingPage";
-
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-axios.defaults.withCredentials = true;
 
 function App() {
   return (

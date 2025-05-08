@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import axios from "axios";
+import api from "../axios";
 import { UserContext } from "../UserContext";
 
 export default function LoginPage() {
@@ -12,7 +12,7 @@ export default function LoginPage() {
   async function handleLoginSubmit(e) {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
+      const { data } = await api.post(
         "/login",
         { email, password },
         { withCredentials: true }
