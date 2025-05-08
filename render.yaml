@@ -4,8 +4,6 @@ services:
     env: node
     buildCommand: cd api && npm install
     startCommand: cd api && npm start
-    runtime: node
-    region: ohio
     envVars:
       - key: MONGO_URL
         sync: false
@@ -26,7 +24,8 @@ services:
       - key: FIREBASE_MEASUREMENT_ID
         sync: false
 
-  - type: static
+  - type: web
     name: airbnb-client
+    env: static
     buildCommand: cd client && npm install && npm run build
-    publishDir: client/dist
+    staticPublishPath: client/dist
