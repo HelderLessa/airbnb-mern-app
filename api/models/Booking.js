@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema({
   place: { type: mongoose.Schema.Types.ObjectId, ref: "Place", required: true },
@@ -10,6 +10,6 @@ const bookingSchema = new mongoose.Schema({
   price: Number,
 });
 
-const BookingModel = mongoose.model("Booking", bookingSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
 
-module.exports = BookingModel;
+export default Booking;

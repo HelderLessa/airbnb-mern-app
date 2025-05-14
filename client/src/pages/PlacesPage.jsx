@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import AccountNav from "../AccountNav";
 import { useEffect, useState } from "react";
-import api from "./axios";
+import api from "../axios.js";
 import PlaceImg from "../PlaceImg";
 
 export default function PlacesPage() {
   const [places, setPlaces] = useState([]);
 
   useEffect(() => {
-    api.get("/user-places").then(({ data }) => {
+    api.get("/places/user-places").then(({ data }) => {
       setPlaces(data);
     });
   }, []);
@@ -47,8 +47,11 @@ export default function PlacesPage() {
                 className="flex gap-4 cursor-pointer bg-gray-100 p-4 rounded-2xl"
                 key={place._id}
               >
-                <div className="flex w-32 h-32 bg-gray-300 grow shrink-0">
-                  <PlaceImg place={place} />
+                <div className="aspect-[4/3] w-32 bg-gray-300">
+                  <PlaceImg
+                    place={place}
+                    className="object-cover w-full h-full"
+                  />
                 </div>
                 <div className="grow-0 shrink">
                   <h2 className="text-xl">{place.title}</h2>

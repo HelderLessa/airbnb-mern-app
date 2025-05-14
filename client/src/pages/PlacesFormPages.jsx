@@ -60,7 +60,7 @@ export default function PlacesFormPages() {
     const placeData = {
       title,
       address,
-      addedPhotos,
+      photos: addedPhotos,
       description,
       perks,
       extraInfo,
@@ -69,12 +69,10 @@ export default function PlacesFormPages() {
       maxGuests,
       price,
     };
+
     if (id) {
-      // update
-      await axios.put("/places", {
-        id,
-        ...placeData,
-      });
+      await api.put(`/places/${id}`, placeData);
+
       setRedirect(true);
     } else {
       await api.post("/places", placeData);

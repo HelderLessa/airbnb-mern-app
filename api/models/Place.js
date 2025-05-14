@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const PlaceSchema = new mongoose.Schema({
+const placeSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   title: String,
   address: String,
@@ -8,12 +8,12 @@ const PlaceSchema = new mongoose.Schema({
   description: String,
   perks: [String],
   extraInfo: String,
-  checkIn: Number,
-  checkOut: Number,
+  checkIn: String,
+  checkOut: String,
   maxGuests: Number,
   price: Number,
 });
 
-const PlaceModel = mongoose.model("Place", PlaceSchema);
+const Place = mongoose.model("Place", placeSchema);
 
-module.exports = PlaceModel;
+export default Place;

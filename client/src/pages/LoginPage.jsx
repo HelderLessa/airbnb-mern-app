@@ -13,7 +13,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       const { data } = await api.post(
-        "/login",
+        "/auth/login",
         { email, password },
         { withCredentials: true }
       );
@@ -26,7 +26,7 @@ export default function LoginPage() {
   }
 
   if (redirect) {
-    return <Navigate to={"/"} />;
+    return <Navigate to={"/account"} />;
   }
 
   return (

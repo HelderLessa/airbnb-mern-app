@@ -29,7 +29,6 @@ export default function BookingWidget({ place }) {
 
   async function bookThisPlace() {
     try {
-      console.log("Place Object: ", place);
       const response = await api.post("/bookings", {
         checkIn,
         checkOut,
@@ -42,7 +41,6 @@ export default function BookingWidget({ place }) {
 
       const bookingId = response.data._id;
 
-      // Redireciona para a página da reserva após o sucesso
       setRedirect(`/account/bookings/${bookingId}`);
     } catch (error) {
       console.error("Error booking the place:", error);

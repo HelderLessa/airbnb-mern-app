@@ -13,11 +13,8 @@ export default function BookingPage() {
     const fetchBooking = async () => {
       if (id) {
         try {
-          const response = await api.get("/bookings");
-          const foundBooking = response.data.find(({ _id }) => _id === id);
-          if (foundBooking) {
-            setBooking(foundBooking);
-          }
+          const response = await api.get(`/bookings/${id}`);
+          setBooking(response.data);
         } catch (error) {
           console.error("Error fetching booking data:", error);
         }
@@ -28,7 +25,7 @@ export default function BookingPage() {
   }, [id]);
 
   if (!booking) {
-    return "";
+    return <div>Loading...</div>;
   }
 
   return (

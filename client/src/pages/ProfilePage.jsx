@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { UserContext } from "../UserContext";
 import { Navigate, useParams } from "react-router-dom";
-import api from "./axios";
+import api from "../axios.js";
 import PlacesPage from "./PlacesPage";
 import AccountNav from "../AccountNav";
 
@@ -14,7 +14,7 @@ export default function ProfilePage() {
   }
 
   async function logout() {
-    await api.post("/logout");
+    await api.post("/auth/logout");
     setRedirect("/");
     setUser(null);
   }

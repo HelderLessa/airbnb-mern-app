@@ -4,14 +4,15 @@ import { useState } from "react";
 export default function PhotosUploader({ addedPhotos, onChange }) {
   const [photoLink, setPhotoLink] = useState("");
 
+  async function handleUploadByLink(url) {
+    const response = await api.post("/api/upload-by-link", { link: url });
+    return response.data.url;
+  }
+
   async function addPhotoByLink(e) {
     e.preventDefault();
-    const { data: filename } = await api.post("/upload-by-link", {
-      link: photoLink,
-    });
-    onChange((prev) => {
-      return [...prev, filename];
-    });
+    const imageUrl = await handleUploadByLink(photoLink);
+    onChange((prev) => [...prev, imageUrl]);
     setPhotoLink("");
   }
 
@@ -23,15 +24,13 @@ export default function PhotosUploader({ addedPhotos, onChange }) {
       data.append("photos", files[i]);
     }
 
-    axios
-      .post("/upload", data, {
+    api
+      .post("/api/upload", data, {
         headers: { "Content-type": "multipart/form-data" },
       })
       .then((response) => {
         const { data: filenames } = response;
-        onChange((prev) => {
-          return [...prev, ...filenames];
-        });
+        onChange((prev) => [...prev, ...filenames]);
       });
   }
 
@@ -67,7 +66,7 @@ export default function PhotosUploader({ addedPhotos, onChange }) {
             <div className="h-32 flex relative" key={link}>
               <img
                 className="rounded-2xl w-full object-cover"
-                src={"http://localhost:4000/uploads/" + link}
+                src={link}
                 alt=""
               />
               <button
