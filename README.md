@@ -4,6 +4,8 @@ This project is a full-featured **Airbnb clone built with the MERN stack (MongoD
 
 > ⚠️ This is a personal project created for learning purposes. It is not affiliated with Airbnb, Inc.
 
+📺 [Live App on Vercel](https://airbnb-mern-frontend-henna.vercel.app/)
+
 ---
 
 ## 🚀 Features
