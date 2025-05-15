@@ -5,7 +5,7 @@ export default function PlaceGallery({ place }) {
 
   if (showAllPhotos) {
     return (
-      <div className="absolute inset-0 bg-black text-white min-h-screen">
+      <div className="absolute inset-0 bg-black text-white min-h-screen z-50">
         <div className="bg-black p-8 grid gap-4">
           <div>
             <h2 className="text-3xl mr-48">Photos of {place.title}</h2>
@@ -31,7 +31,11 @@ export default function PlaceGallery({ place }) {
           {place?.photos?.length > 0 &&
             place.photos.map((photo, index) => (
               <div key={index}>
-                <img src={photo} alt="" />
+                <img
+                  className="w-full object-cover max-h-[500px] rounded-2xl"
+                  src={photo}
+                  alt=""
+                />
               </div>
             ))}
         </div>
@@ -42,37 +46,37 @@ export default function PlaceGallery({ place }) {
   return (
     <div className="relative">
       <div className="grid gap-2 grid-cols-[2fr_1fr] rounded-3xl overflow-hidden">
-        <div>
+        <div className="overflow-hidden max-h-[500px]">
           {place.photos?.[0] && (
-            <div className="">
-              <img
-                onClick={() => setShowAllPhotos(true)}
-                className="aspect-square cursor-pointer object-cover"
-                src={place.photos?.[0]}
-                alt=""
-              />
-            </div>
+            <img
+              onClick={() => setShowAllPhotos(true)}
+              className="w-full h-full object-cover cursor-pointer rounded-2xl"
+              src={place.photos?.[0]}
+              alt=""
+            />
           )}
         </div>
         <div className="grid">
           {place.photos?.[1] && (
-            <img
-              onClick={() => setShowAllPhotos(true)}
-              className="aspect-square cursor-pointer object-cover"
-              src={place.photos?.[1]}
-              alt=""
-            />
-          )}
-          <div className="overflow-hidden">
-            {place.photos?.[2] && (
+            <div className="overflow-hidden max-h-[250px]">
               <img
                 onClick={() => setShowAllPhotos(true)}
-                className="aspect-square cursor-pointer object-cover relative top-2"
+                className="w-full h-full object-cover cursor-pointer rounded-2xl"
+                src={place.photos?.[1]}
+                alt=""
+              />
+            </div>
+          )}
+          {place.photos?.[2] && (
+            <div className="overflow-hidden max-h-[250px] relative top-2">
+              <img
+                onClick={() => setShowAllPhotos(true)}
+                className="w-full h-full object-cover cursor-pointer rounded-2xl"
                 src={place.photos?.[2]}
                 alt=""
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
       <button

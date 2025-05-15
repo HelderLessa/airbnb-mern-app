@@ -16,12 +16,12 @@ export default function IndexPage() {
         places.map((place, index) => {
           return (
             <Link to={"/place/" + place._id} key={index}>
-              <div className="bg-gray-500 mb-2 rounded-2xl flex">
+              <div className="bg-gray-500 mb-2 rounded-2xl overflow-hidden aspect-square">
                 {place.photos?.[0] && (
                   <img
-                    className="rounded-2xl object-cover aspect-square"
-                    src={place.photos?.[0]}
-                    alt=""
+                    className="w-full h-full object-cover"
+                    src={place.photos[0]}
+                    alt="Place"
                   />
                 )}
               </div>
