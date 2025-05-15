@@ -43,11 +43,14 @@ export const login = async (req, res) => {
       jwtSecret,
       { expiresIn: "1d" }
     );
+
+    const isProduction = process.env.NODE_ENV === "production";
+
     res
       .cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false,
+        sameSite: isProduction ? "None" : "Lax",
+        secure: isProduction,
         path: "/",
       })
       .json({ id: user._id, name: user.name, email: user.email });
@@ -75,8 +78,9 @@ export const profile = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     secure: process.env.NODE_ENV === "production",
+    path: "/",
   });
   res.status(200).json({ success: true });
 };

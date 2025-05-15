@@ -17,8 +17,8 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const allowedOrigins = [
-  "http://localhost:5173",
   "https://airbnb-mern-frontend-henna.vercel.app",
+  "http://localhost:5173",
 ];
 
 app.use(
